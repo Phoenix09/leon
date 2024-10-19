@@ -55,6 +55,11 @@ class CleanerService(
 
 				do {
 					prevResult = result
+					if (decodeUrl) {
+						withContext(Dispatchers.Default) {
+							result = decodeUrl(result)
+						}
+					}
 					result = cleanUrl(result, sanitizers)
 					i++
 				} while (result != prevResult && i < MAX_ITERATION)
@@ -62,15 +67,7 @@ class CleanerService(
 				Pair(currentText.replace(match.value, result), urls + result)
 			}
 			.let { (cleaned, urls) ->
-				val decoded = if (decodeUrl) {
-					withContext(Dispatchers.Default) {
-						decodeUrl(cleaned)
-					}
-				} else {
-					cleaned
-				}
-
-				Pair(decoded, urls)
+				Pair(cleaned, urls)
 			}
 
 		return Result(
